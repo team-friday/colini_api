@@ -1,6 +1,3 @@
-spring:
-  profiles: local
-
 datasource:
   platform: h2
   url: jdbc:h2:tcp://localhost:9092/mem:testdb;MVCC=TRUE

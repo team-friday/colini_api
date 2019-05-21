@@ -1,20 +1,23 @@
 package com.friday.colini.firdaycoliniaccountapi.domain;
 
+
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     @Column(unique = true, nullable = false)
     private String email;
@@ -22,34 +25,56 @@ public class Account {
     private String password;
     @Column(nullable = false)
     private String userName;
-    @ElementCollection(fetch = FetchType.EAGER)
+    private String imageUrl;
     @Enumerated(value = EnumType.STRING)
-    private Set<RoleType> roles;
+    private RoleType role;
     private boolean mailYn;
     private boolean status;
-    @CreatedDate
-    @Column(name = "create_at", updatable = false)
-    private LocalDateTime creratAt;
-    @LastModifiedDate
-    @Column(name = "update_at")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(value = EnumType.STRING)
+    private Set<AuthProviders> providers;
+    private String providerId;
+    private LocalDateTime createAt;
     private LocalDateTime updateAt;
 
     @Builder
     public Account(String email,
                    String password,
                    String userName,
-                   Set<RoleType> roles,
+                   RoleType role,
                    boolean mailYn,
                    boolean status,
-                   LocalDateTime creratAt,
+                   Set<AuthProviders> providers,
+                   LocalDateTime createAt,
                    LocalDateTime updateAt) {
         this.email = email;
         this.password = password;
         this.userName = userName;
-        this.roles = roles;
+        this.role = role;
         this.mailYn = mailYn;
         this.status = status;
-        this.creratAt = creratAt;
+        this.createAt = createAt;
         this.updateAt = updateAt;
+        this.providers = new HashSet<>(Arrays.asList(AuthProviders.local));
+    }
+
+    public Account(
+            String userName,
+            String email,
+            String imageUrl,
+            boolean mailYn,
+            String providerId,
+            AuthProviders providers
+    ) {
+        this.userName = userName;
+        this.email = email;
+        this.password = "Auth2 SignUp";
+        this.imageUrl = imageUrl;
+        this.role = RoleType.USER;
+        this.mailYn = mailYn;
+        this.status = true;
+        this.providerId = providerId;
+        this.providers = new HashSet<>(Arrays.asList(providers
+        ));
     }
 }

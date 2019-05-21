@@ -1,26 +1,44 @@
 spring:
   profiles:
     active: dev
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 434541373271-h977ssvpjlv003tdkfof6f49pqg8fsqr.apps.googleusercontent.com
+            client-secret: d9k1lSwtPwrfHBtpwrp-fTac
+            scope: email, profile
+            redirect-uri-template: "{baseUrl}/oauth2/callback/{registrationId}"
 
 datasource:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
+        show_seq: true
         format_sql: true
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.security.oauth2.jwt: DEBUG
 
 # security
 my-app:
+  authorizedRedirectUris: http://localhost:3000/oauth2/redirect
+  auth:
+    jwt:
+      secret: HS123
+      expiration: 360000
   client-id: myApp
   client-secret: pass
   admin-id: admin@email.com
   admin-password: admin
   user-id: user@email.com
   user-password: user
+

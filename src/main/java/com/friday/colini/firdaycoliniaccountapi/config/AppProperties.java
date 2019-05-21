@@ -24,4 +24,6 @@ public class AppProperties {
     private String userId;
     @NotEmpty
     private String userPassword;
+
+
 }

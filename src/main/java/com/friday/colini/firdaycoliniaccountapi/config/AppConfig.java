@@ -1,8 +1,8 @@
 package com.friday.colini.firdaycoliniaccountapi.config;
 
-import com.friday.colini.firdaycoliniaccountapi.domain.Account;
 import com.friday.colini.firdaycoliniaccountapi.domain.RoleType;
-import com.friday.colini.firdaycoliniaccountapi.service.AccountService;
+import com.friday.colini.firdaycoliniaccountapi.dto.SignUpRequest;
+import com.friday.colini.firdaycoliniaccountapi.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -11,22 +11,19 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 @Component
 public class AppConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();  // bcrypt
     }
 
     @Bean
-    public ApplicationRunner runner(){
+    public ApplicationRunner runner() {
         return new ApplicationRunner() {
             @Autowired
-            AccountService accountService;
+            CustomUserDetailsService customUserDetailsService;
             @Autowired
             AppProperties appProperties;
 
@@ -35,14 +32,22 @@ public class AppConfig {
                 setFixtureAccount("admin", appProperties.getAdminId(), appProperties.getAdminPassword(), RoleType.ADMIN);
                 setFixtureAccount("user", appProperties.getUserId(), appProperties.getUserPassword(), RoleType.USER);
             }
-            private void setFixtureAccount(String userName, String email, String password, RoleType role) {
-                Account account = Account.builder()
+
+            private void setFixtureAccount(String userName,
+                                           String email,
+                                           String password,
+                                           RoleType role) {
+                SignUpRequest account = SignUpRequest.builder()
                         .userName(userName)
                         .email(email)
                         .password(password)
-                        .roles(new HashSet<>(Arrays.asList(role)))
+                        .role(role)
                         .build();
-                accountService.signUp(account);
+                try {
+                    customUserDetailsService.loadUserByUsername(email);
+                } catch (Exception e) {
+                    customUserDetailsService.signUp(account);
+                }
             }
         };
     }
